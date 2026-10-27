@@ -8,11 +8,11 @@
 //   META_PAGE_TOKEN  jeton de page Facebook longue durée (n'expire pas)
 //   FB_PAGE_ID       id de la page Facebook
 //   IG_USER_ID       id du compte Instagram professionnel (instagram_business_account)
-//   GRAPH_VERSION    optionnel, défaut v21.0
+//   GRAPH_VERSION    optionnel, défaut v26.0
 //   DRY_RUN=1        optionnel : affiche ce qui serait publié sans rien publier
 
 const env = process.env;
-const GV = env.GRAPH_VERSION || "v21.0";
+const GV = env.GRAPH_VERSION || "v26.0";
 const G = `https://graph.facebook.com/${GV}`;
 const DRY = env.DRY_RUN === "1";
 const NOTION_V = "2022-06-28";
