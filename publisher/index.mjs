@@ -11,6 +11,8 @@
 //   GRAPH_VERSION    optionnel, défaut v26.0
 //   DRY_RUN=1        optionnel : affiche ce qui serait publié sans rien publier
 
+import { collectStats } from "./stats.mjs";
+
 const env = process.env;
 const GV = env.GRAPH_VERSION || "v26.0";
 const G = `https://graph.facebook.com/${GV}`;
@@ -225,5 +227,7 @@ for (const page of pages) {
     try { await setStatus(page.id, "Erreur", { erreur: e.message }); } catch (e2) { log("  impossible d'écrire l'erreur dans Notion", e2.message); }
   }
 }
+try { await collectStats({ notion, graph, log, deadline: t0 + MAX_RUN_MS, dry: DRY }); }
+catch (e) { log("Stats : erreur", e.message); }
 log(`Terminé${errors ? ` avec ${errors} erreur(s)` : ""}`);
 process.exit(0);
