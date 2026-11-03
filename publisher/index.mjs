@@ -85,6 +85,32 @@ async function graph(path, params = {}, method = "POST") {
 
 const isVideo = (u) => /\.(mp4|mov)(\?|$)/i.test(u);
 
+// jsDelivr refuse les dépôts de plus de 50 Mo : tant qu'un fichier n'est pas en cache, il répond 403 en texte,
+// et Meta rejette le média. Images : GitHub d'abord (image/jpeg fiable). Vidéos : jsDelivr d'abord,
+// car GitHub les sert en application/octet-stream ; GitHub reste le secours.
+const JSDELIVR = /^https:\/\/cdn\.jsdelivr\.net\/gh\/([^/]+)\/([^/@]+)@([^/]+)\/(.+)$/;
+function mediaSource(u, attempt) {
+  const m = u.match(JSDELIVR);
+  if (!m) return u;
+  const raw = `https://raw.githubusercontent.com/${m[1]}/${m[2]}/${m[3]}/${m[4]}`;
+  return (isVideo(u) ? [u, raw] : [raw, u])[attempt % 2];
+}
+
+const MEDIA_ERROR = /Only photo or video|Media ID is not available|requested resource does not exist|Missing or invalid image|traitement|Media upload has failed|Facebook upload/i;
+const ATTEMPTS = 3;
+
+// Réessaie uniquement les erreurs de récupération du média, en changeant de source à chaque essai.
+async function withMediaRetries(fn) {
+  for (let attempt = 0; ; attempt++) {
+    try { return await fn(attempt); }
+    catch (e) {
+      if (attempt >= ATTEMPTS - 1 || !MEDIA_ERROR.test(e.message) || Date.now() - t0 > MAX_RUN_MS - 60000) throw e;
+      log(`  essai ${attempt + 1} échoué (${e.message}), nouvel essai`);
+      await sleep(15000);
+    }
+  }
+}
+
 // Instagram : attend qu'un conteneur vidéo soit prêt. Renvoie "FINISHED", "IN_PROGRESS" (on reprendra plus tard) ou lève une erreur.
 async function igWait(containerId, maxMs) {
   const end = Date.now() + maxMs;
@@ -93,7 +119,7 @@ async function igWait(containerId, maxMs) {
     if (s.status_code === "FINISHED") return "FINISHED";
     if (s.status_code === "ERROR" || s.status_code === "EXPIRED") throw new Error(`Instagram : traitement vidéo ${s.status_code} ${s.status || ""}`);
     if (Date.now() > end) return "IN_PROGRESS";
-    await sleep(8000);
+    await sleep(3000);
   }
 }
 
@@ -110,7 +136,7 @@ async function igCreate(type, media, caption) {
     const children = [];
     for (const u of media.slice(0, 10)) {
       const c = await graph(`${ig}/media`, isVideo(u) ? { media_type: "VIDEO", video_url: u, is_carousel_item: "true" } : { image_url: u, is_carousel_item: "true" });
-      if (isVideo(u)) await igWait(c.id, 120000);
+      if ((await igWait(c.id, 120000)) !== "FINISHED") throw new Error("Instagram : traitement d'un média du carrousel trop long");
       children.push(c.id);
     }
     return (await graph(`${ig}/media`, { media_type: "CAROUSEL", children: children.join(","), caption })).id;
@@ -183,21 +209,21 @@ async function handle(page) {
   if (DRY) return log("DRY", { reseau, type, media, caption: caption.slice(0, 80) });
 
   if (reseau === "Instagram") {
-    // Reprise d'un conteneur vidéo encore en traitement au passage précédent
-    let container = statut === "Traitement" && ref.startsWith("container:") ? ref.slice(10) : null;
-    if (!container) {
-      await setStatus(page.id, "En cours");
-      container = await igCreate(type, media, caption);
-    }
-    const needsWait = type === "Reel" || (type === "Story" && isVideo(media[0])) || (type === "Post" && isVideo(media[0]));
-    if (needsWait) {
+    // Reprise d'un conteneur encore en traitement au passage précédent
+    let resume = statut === "Traitement" && ref.startsWith("container:") ? ref.slice(10) : null;
+    if (!resume) await setStatus(page.id, "En cours");
+    const id = await withMediaRetries(async (attempt) => {
+      const container = resume || await igCreate(type, media.map((u) => mediaSource(u, attempt)), caption);
+      resume = null;
+      // Toujours attendre, images comprises : publier un conteneur pas prêt donne « Media ID is not available ».
       const left = Math.max(30000, MAX_RUN_MS - (Date.now() - t0) - 30000);
       if ((await igWait(container, left)) !== "FINISHED") {
         await setStatus(page.id, "Traitement", { ref: `container:${container}` });
-        return log("  vidéo encore en traitement, reprise au prochain passage");
+        return null;
       }
-    }
-    const id = await igPublish(container);
+      return igPublish(container);
+    });
+    if (!id) return log("  média encore en traitement, reprise au prochain passage");
     await setStatus(page.id, "Publié", { ref: id, erreur: "" });
     return log("  publié IG", id);
   }
@@ -205,7 +231,7 @@ async function handle(page) {
   if (reseau === "Facebook") {
     if (statut === "Traitement") return; // pas de reprise côté FB
     await setStatus(page.id, "En cours");
-    const id = await fbPublish(type, media, caption);
+    const id = await withMediaRetries((attempt) => fbPublish(type, media.map((u) => mediaSource(u, attempt)), caption));
     await setStatus(page.id, "Publié", { ref: id, erreur: "" });
     return log("  publié FB", id);
   }

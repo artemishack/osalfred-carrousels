@@ -65,6 +65,13 @@ export async function collectStats({ notion, graph, log, deadline, dry }) {
   }
 }
 
+// Chaque refus de Meta n'est affiché qu'une fois par passage, pour rester lisible.
+const warned = new Set();
+function warnRefused(what, e) {
+  const msg = `Stats : Meta refuse ${what} : ${e.message}`;
+  if (!warned.has(msg)) { warned.add(msg); console.log(new Date().toISOString(), msg); }
+}
+
 // Une métrique à la fois : si Meta en refuse une, les autres passent quand même.
 async function metrics(graph, id, list, extra = {}) {
   const out = {};
@@ -78,7 +85,7 @@ async function metrics(graph, id, list, extra = {}) {
         const j = await graph(`${id}/insights`, { metric: m, ...extra }, "GET");
         const d = j.data?.[0];
         if (d) out[d.name] = d.values?.[0]?.value ?? d.total_value?.value;
-      } catch { /* métrique indisponible pour ce type de média */ }
+      } catch (e) { warnRefused(m, e); }
     }
     return out;
   }
@@ -104,7 +111,7 @@ async function fbStats(graph, id, type) {
     try {
       const j = await graph(`${id}/video_insights`, {}, "GET");
       for (const d of j.data || []) v[d.name] = d.values?.[0]?.value;
-    } catch { /* pas d'accès aux insights vidéo */ }
+    } catch (e) { warnRefused("video_insights", e); }
     let f = {};
     try { f = await graph(id, { fields: "likes.summary(true).limit(0),comments.summary(true).limit(0)" }, "GET"); } catch {}
     return {
