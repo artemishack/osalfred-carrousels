@@ -52,10 +52,15 @@ Classer chaque post en **haut / milieu / bas tiers** de son format. Ne rien conc
 ## 5. Produire
 
 - Carrousels : `studio/carrousel` (data.py / build_all.py / engine.py), 1080×1350, charte Montserrat + Inter, bleu #0066FF, nuit #0B132B.
+- Reels 3D (v10) : `studio/motion/engine8.html` + `render8.py` (three.js, planche de contrôle obligatoire), `npm i three@0.149.0` dans `studio/motion`.
 - Reels : `studio/motion` (scripts7.py → voix ElevenLabs « Raphael », `creative_list_voices` pour l'id → getvoice7.sh → reels7.py / render7.py, moteur engine5.html avec zone sûre). Structure Hook → Contexte → Re-hook → Réponse → CTA, tutoiement, résultat concret.
 - Pousser les médias dans le repo (`reels-v9/`, `v3/…`) puis utiliser les URL jsDelivr `https://cdn.jsdelivr.net/gh/artemishack/osalfred-carrousels@main/…`. Attention : le dépôt dépasse la limite de 50 Mo de jsDelivr, qui répond parfois 403 ; le robot bascule donc sur GitHub (images d'abord, vidéos en secours).
 
 **Règles de fond (non négociables)** : zéro faux chiffre, faux témoignage ou fausse stat ; pas de prix ; jamais « maintenance incluse », « le code vous appartient à 100 % », « sans frais mensuels » ; « OS Alfred » dans les textes ; pas de Wasquehal ; pas de liste d'outils techniques. Un chiffre = un calcul exemple présenté comme tel.
+
+## 5 bis. Auditer avant publication
+
+Avant de programmer, passer **tous les posts non publiés** (Notion `Programmé` / `À valider`, Metricool programmés et brouillons) à la grille de `studio/AUDIT.md` (copywriting + Méthode 21) : note /10, cause dans `Diagnostic`, légende corrigée, interjection d'ouverture coupée. Le même fichier donne les règles de motion et le moteur 3D (`engine8.html`, `render8.py`).
 
 ## 6. Programmer
 
