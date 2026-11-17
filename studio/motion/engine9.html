@@ -40,7 +40,8 @@ const S=new THREE.Scene();const cam=new THREE.PerspectiveCamera(28,1080/1920,.1,
   const p=new THREE.PMREMGenerator(R);S.environment=p.fromScene(e,.03).texture;})();
 const key=new THREE.DirectionalLight(0xffffff,.9);key.position.set(2.5,5,6);key.castShadow=true;key.shadow.mapSize.set(2048,2048);
 Object.assign(key.shadow.camera,{left:-5,right:5,top:6,bottom:-6});key.shadow.radius=30;key.shadow.blurSamples=25;key.shadow.bias=-.0004;S.add(key);
-const wall=new THREE.Mesh(new THREE.PlaneGeometry(40,40),new THREE.ShadowMaterial({opacity:.11}));wall.position.z=-2.2;wall.receiveShadow=true;S.add(wall);
+{const c=document.createElement('canvas');c.width=8;c.height=512;const x=c.getContext('2d');const g=x.createLinearGradient(0,0,0,512);g.addColorStop(0,'#f6f9fd');g.addColorStop(.55,'#e6ecf5');g.addColorStop(1,'#f2f5fa');x.fillStyle=g;x.fillRect(0,0,8,512);const tx=new THREE.CanvasTexture(c);tx.encoding=THREE.sRGBEncoding;const bg=new THREE.Mesh(new THREE.PlaneGeometry(60,60),new THREE.MeshBasicMaterial({map:tx,toneMapped:false}));bg.position.z=-2.3;S.add(bg);}
+const wall=new THREE.Mesh(new THREE.PlaneGeometry(40,40),new THREE.ShadowMaterial({opacity:.07}));wall.position.z=-2.2;wall.receiveShadow=true;S.add(wall);
 // ------------------------------------------------------------ helpers
 function rrShape(w,h,r){const s=new THREE.Shape(),x=-w/2,y=-h/2;s.moveTo(x+r,y);s.lineTo(x+w-r,y);s.absarc(x+w-r,y+r,r,-Math.PI/2,0);s.lineTo(x+w,y+h-r);s.absarc(x+w-r,y+h-r,r,0,Math.PI/2);s.lineTo(x+r,y+h);s.absarc(x+r,y+h-r,r,Math.PI/2,Math.PI);s.lineTo(x,y+r);s.absarc(x+r,y+r,r,Math.PI,Math.PI*1.5);return s}
 function slab(w,h,d,r,mat,bev=.03){const g=new THREE.ExtrudeGeometry(rrShape(w,h,r),{depth:d,bevelEnabled:true,bevelThickness:bev,bevelSize:bev,bevelSegments:6,curveSegments:24});g.translate(0,0,-d/2);const m=new THREE.Mesh(g,mat);m.castShadow=true;return m}
@@ -111,7 +112,7 @@ function build(cfg){C=cfg;ov.innerHTML='';
   O.p1=el('mid','Et le pire&nbsp;?',190);O.p2=el('mid','Tout ça peut tourner<br><span class="a">sans toi.</span>',170);
   O.s1=el('sm','Tes tâches répétitives',170);O.s2=el('mid a','→ un outil simple.',250);
   O.f1=el('big','Tu as mieux<br>à <span class="a">faire.</span>',150);
-  O.c1=el('mid','Décris <span class="a">ton problème</span>',170);O.c2=el('sm','<span class="pill">osalfred.com</span>',300);O.c3=el('sm','<span style="display:inline-block;padding:26px 44px;border-radius:44px;background:rgba(255,255,255,.86);box-shadow:0 20px 50px rgba(11,19,43,.16)">Ta feuille de route <span class="a">sous 48 h.</span></span>',1420);
+  O.c1=el('mid','Décris <span class="a">ton problème</span>',170);O.c2=el('sm','<span class="pill">osalfred.com</span>',300);O.c3=el('sm','<span style="display:inline-block;padding:26px 44px;border-radius:44px;background:rgba(255,255,255,.86);box-shadow:0 20px 50px rgba(11,19,43,.16);white-space:nowrap">Ta feuille de route <span class="a">sous 48&nbsp;h.</span></span>',1420);
   const cap=document.createElement('div');cap.id='cap';ov.appendChild(cap);O.cap=cap}
 function render(t){
   const T={tR:W(11),tD:W(12),tF:W(13),tT:W(14),tM:W(19),tPire:W(30),tSans:W(33),tAvec:W(39),tTach:W(42),tMieux:W(49),tDec:W(54),tFeu:W(61)},END=C.dur;
