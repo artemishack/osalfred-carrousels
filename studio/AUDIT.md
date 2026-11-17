@@ -63,6 +63,7 @@ Sources lues le 17/11 : charlie947/motion-graphics-skills, heygen-com/hyperframe
 ## 3D
 
 - `studio/motion/engine8.html` + `render8.py` : scène three.js (téléphone, cartes, tuile outil), ombres douces, caméra animée, textes DOM par-dessus. Rendu logiciel, environ 15 min pour 22 s à 30 i/s.
+- **Moteur de référence depuis le 17/11 : `studio/motion/engine9.html` + `render9.py`** (style « téléphone en verre », inspiration fournie par Matisse) : studio clair, iPhone 3D debout, écran en texture canvas, pastilles de verre dépoli qui sortent de l'écran sur chaque mot, caméra en poussée continue, fin sur téléphone noir avec logo. Un seul objet (le téléphone) du début à la fin. Rendu logiciel : environ 30 min pour 22 s. `engine8` (cartes à plat) a été jugé « pas beau » : ne plus l'utiliser.
 - **Blender** (connecteur du PC de Matisse) : utilisable seulement si Blender est ouvert avec l'add-on MCP démarré. Le 17/11 il n'était pas joignable (« Cannot connect to Blender at localhost:9876 »). Si un rendu Blender est voulu : le signaler à Matisse dans le compte rendu, ne pas bloquer la boucle.
 
 ## Organisation (template « organisation méthode 21 »)

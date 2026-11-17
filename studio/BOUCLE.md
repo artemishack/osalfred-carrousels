@@ -52,7 +52,7 @@ Classer chaque post en **haut / milieu / bas tiers** de son format. Ne rien conc
 ## 5. Produire
 
 - Carrousels : `studio/carrousel` (data.py / build_all.py / engine.py), 1080×1350, charte Montserrat + Inter, bleu #0066FF, nuit #0B132B.
-- Reels 3D (v10) : `studio/motion/engine8.html` + `render8.py` (three.js, planche de contrôle obligatoire), `npm i three@0.149.0` dans `studio/motion`.
+- Reels 3D (v10) : `studio/motion/engine9.html` + `render9.py` (style verre, voir AUDIT.md ; engine8 abandonné) (three.js, planche de contrôle obligatoire), `npm i three@0.149.0` dans `studio/motion`.
 - Reels : `studio/motion` (scripts7.py → voix ElevenLabs « Raphael », `creative_list_voices` pour l'id → getvoice7.sh → reels7.py / render7.py, moteur engine5.html avec zone sûre). Structure Hook → Contexte → Re-hook → Réponse → CTA, tutoiement, résultat concret.
 - Pousser les médias dans le repo (`reels-v9/`, `v3/…`) puis utiliser les URL jsDelivr `https://cdn.jsdelivr.net/gh/artemishack/osalfred-carrousels@main/…`. Attention : le dépôt dépasse la limite de 50 Mo de jsDelivr, qui répond parfois 403 ; le robot bascule donc sur GitHub (images d'abord, vidéos en secours).
 
@@ -66,6 +66,7 @@ Avant de programmer, passer **tous les posts non publiés** (Notion `Programmé`
 
 - IG + FB : lignes Notion avec le statut défini dans la tâche planifiée (`À valider` ou `Programmé`). Le robot ne publie que `Programmé`.
 - TikTok : Metricool, **20 posts maximum par mois** au total. Remplacer les moins bons brouillons par les nouvelles versions, garder l'étalement sur le mois, reels 18 h / carrousels 10 h en semaine, 10 h le week-end.
+- **Reels d'essai Instagram** (`Type = Reel d'essai`) : montrés aux non-abonnés seulement, le robot les publie avec `trial_params` (bascule en reel normal automatique si bonne performance, variable `TRIAL_GRADUATION`). Servent à tester une accroche ou une nouvelle version sans toucher le fil : un par jour à 12 h 15. Si Meta refuse (compte non éligible), la ligne passe en `Erreur` : le signaler à Matisse et repasser la ligne en `Reel`.
 - Ne jamais toucher à ce qui est déjà publié.
 
 ## 7. Rendre compte
