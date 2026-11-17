@@ -143,6 +143,9 @@ async function igCreate(type, media, caption) {
   }
   const u = media[0];
   if (type === "Reel") return (await graph(`${ig}/media`, { media_type: "REELS", video_url: u, caption, share_to_feed: "true" })).id;
+  // Reel d'essai (Trial Reel) : montré d'abord aux non-abonnés ; Instagram le publie pour tous s'il marche (SS_PERFORMANCE)
+  if (type === "Reel d'essai") return (await graph(`${ig}/media`, { media_type: "REELS", video_url: u, caption,
+    trial_params: JSON.stringify({ graduation_strategy: env.TRIAL_GRADUATION || "SS_PERFORMANCE" }) })).id;
   if (type === "Story") return (await graph(`${ig}/media`, isVideo(u) ? { media_type: "STORIES", video_url: u } : { media_type: "STORIES", image_url: u })).id;
   // Post simple
   return (await graph(`${ig}/media`, isVideo(u) ? { media_type: "REELS", video_url: u, caption } : { image_url: u, caption })).id;

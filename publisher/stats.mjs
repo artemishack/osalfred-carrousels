@@ -97,7 +97,7 @@ async function igStats(graph, id, type) {
     return { views: m.views, reach: m.reach, comments: m.replies, shares: m.shares };
   }
   const list = ["views", "reach", "likes", "comments", "shares", "saved", "total_interactions"];
-  if (type === "Reel") list.push("ig_reels_avg_watch_time");
+  if (type === "Reel" || type === "Reel d'essai") list.push("ig_reels_avg_watch_time");
   const m = await metrics(graph, id, list);
   return {
     views: m.views, reach: m.reach, likes: m.likes, comments: m.comments, shares: m.shares, saves: m.saved,
